@@ -124,7 +124,7 @@ A API automaticamente detecta e utiliza GPU se disponível. Para usar com GPU:
 ### Estrutura do Projeto
 
 whisper-api/
-
+```
 whisper-api/
 ├── app/
 │   ├── main.py         # Aplicação principal
@@ -134,7 +134,7 @@ whisper-api/
 ├── Dockerfile          # Configuração Docker
 ├── docker-compose.yml  # Configuração Docker Compose
 └── README.md           # Documentação
-
+```
 
 
 ### Dependências Principais
