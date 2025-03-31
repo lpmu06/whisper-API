@@ -98,6 +98,17 @@ A API retorna um JSON no seguinte formato:
 
 ### Variáveis de Ambiente
 - `WHISPER_MODEL`: Modelo Whisper a ser usado (default: "base")
+  ```bash
+  # Exemplo: usar modelo medium
+  WHISPER_MODEL=medium docker-compose up
+
+  # Modelos disponíveis:
+  # - tiny
+  # - base
+  # - small
+  # - medium
+  # - large
+  ```
 - `MAX_FILE_SIZE_MB`: Tamanho máximo do arquivo em MB (default: 25)
 - `LANGUAGE`: Idioma para transcrição (default: "pt")
 
