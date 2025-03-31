@@ -125,12 +125,19 @@ A API automaticamente detecta e utiliza GPU se disponível. Para usar com GPU:
 
 whisper-api/
 ├── app/
+
 │   ├── main.py         # Aplicação principal
+
 │   ├── config.py       # Configurações
+
 │   └── transcriber.py  # Lógica de transcrição
+
 ├── requirements.txt    # Dependências Python
+
 ├── Dockerfile         # Configuração Docker
+
 ├── docker-compose.yml # Configuração Docker Compose
+
 └── README.md         # Documentação
 
 
