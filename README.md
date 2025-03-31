@@ -9,10 +9,13 @@ API REST desenvolvida com FastAPI para transcrição de áudio para texto utiliz
 - Otimizado para português brasileiro
 - Interface Swagger UI para testes (/docs)
 - Suporte a GPU (CUDA) quando disponível
+- Validação de arquivos e tratamento de erros
+- Healthcheck endpoint
 
 ## 📋 Pré-requisitos
 
 - Docker
+- Docker Compose
 - Git
 - (Opcional) NVIDIA GPU com CUDA para melhor performance
 
@@ -20,18 +23,13 @@ API REST desenvolvida com FastAPI para transcrição de áudio para texto utiliz
 
 ### 1. Clone o repositório
 ```bash
-git clone <https://github.com/lpmu06/whisper-API>
+git clone https://github.com/lpmu06/whisper-API
 cd whisper-api
 ```
 
-### 2. Construa a imagem Docker
+### 2. Execute com Docker Compose
 ```bash
-docker build -t whisper-api .
-```
-
-### 3. Execute o container
-```bash
-docker run -d -p 8000:8000 whisper-api
+docker-compose up --build
 ```
 
 A API estará disponível em `http://localhost:8000`
@@ -40,13 +38,13 @@ A API estará disponível em `http://localhost:8000`
 
 ### Endpoint Principal
 
-- **URL**: `/whisper`
+- **URL**: `/transcribe`  # Atualizado de /whisper para /transcribe
 - **Método**: `POST`
 - **Content-Type**: `multipart/form-data`
 
 ### Exemplo de uso com cURL
 ```bash
-curl -X POST "http://localhost:8000/whisper" \
+curl -X POST "http://localhost:8000/transcribe" \
      -H "accept: application/json" \
      -H "Content-Type: multipart/form-data" \
      -F "files=@seu_audio.mp3"
@@ -56,7 +54,7 @@ curl -X POST "http://localhost:8000/whisper" \
 ```python
 import requests
 
-url = "http://localhost:8000/whisper"
+url = "http://localhost:8000/transcribe"
 files = [
     ('files', ('audio.mp3', open('audio.mp3', 'rb'), 'audio/mpeg'))
 ]
@@ -68,7 +66,12 @@ print(response.json())
 ### Formatos de Áudio Suportados
 - MP3 (.mp3)
 - WAV (.wav)
-- Outros formatos suportados pelo ffmpeg
+- M4A (.m4a)
+- OGG (.ogg)
+
+### Limitações
+- Tamanho máximo do arquivo: 25MB
+- Apenas formatos de áudio suportados serão aceitos
 
 ### Resposta
 A API retorna um JSON no seguinte formato:
@@ -86,7 +89,7 @@ A API retorna um JSON no seguinte formato:
 ## 🔍 Testando a API
 
 1. Acesse a documentação Swagger UI em `http://localhost:8000/docs`
-2. Expanda o endpoint POST `/whisper`
+2. Expanda o endpoint POST `/transcribe`
 3. Clique em "Try it out"
 4. Faça upload de um arquivo de áudio
 5. Execute e verifique a resposta
@@ -94,51 +97,69 @@ A API retorna um JSON no seguinte formato:
 ## ⚙️ Configuração Avançada
 
 ### Variáveis de Ambiente
-- `PORT`: Porta da aplicação (default: 8000)
-- Outras configurações podem ser adicionadas conforme necessidade
+- `WHISPER_MODEL`: Modelo Whisper a ser usado (default: "base")
+- `MAX_FILE_SIZE_MB`: Tamanho máximo do arquivo em MB (default: 25)
+- `LANGUAGE`: Idioma para transcrição (default: "pt")
 
 ### Usando GPU
 A API automaticamente detecta e utiliza GPU se disponível. Para usar com GPU:
 
 1. Instale os drivers NVIDIA
 2. Instale o NVIDIA Container Toolkit
-3. Execute o container com suporte a GPU:
-```bash
-docker run --gpus all -d -p 8000:8000 whisper-api
-```
+3. Execute com Docker Compose (configuração GPU já incluída)
 
 ## 🛠️ Desenvolvimento
 
 ### Estrutura do Projeto
 
 whisper-api/
-├── fastapi_app.py    # Aplicação principal
-├── requirements.txt  # Dependências Python
-├── Dockerfile       # Configuração Docker
-└── README.md       # Documentação
+├── app/
+│   ├── main.py         # Aplicação principal
+│   ├── config.py       # Configurações
+│   └── transcriber.py  # Lógica de transcrição
+├── requirements.txt    # Dependências Python
+├── Dockerfile         # Configuração Docker
+├── docker-compose.yml # Configuração Docker Compose
+└── README.md         # Documentação
 
 
 ### Dependências Principais
-- FastAPI
-- Uvicorn
+- FastAPI (0.104.1)
+- Uvicorn (0.15.0)
 - OpenAI Whisper
-- PyTorch
-- python-multipart
-- aiofiles
+- PyTorch (2.1.2)
+- NumPy (1.24.3)
+- python-multipart (0.0.6)
+- aiofiles (23.2.1)
+- pydantic (2.5.3)
+- pydantic-settings (2.1.0)
 
 ## 📈 Performance
 
 - O modelo base do Whisper é usado por padrão
 - Para melhor precisão em português, considere usar modelos maiores (medium/large)
 - O tempo de processamento varia conforme o hardware e tamanho do áudio
+- Em CPU, o modelo usa precisão FP32
+- Em GPU, o modelo usa precisão FP16 para melhor performance
 
-## ✨ Próximos Passos
+## ✨ Melhorias Implementadas
 
-- [ ] Implementar limite de tamanho de arquivo
+- [x] Implementar limite de tamanho de arquivo (25MB)
+- [x] Implementar validação de tipos de arquivo
+- [x] Otimizar configurações para português brasileiro
+- [x] Adicionar tratamento de erros
+- [x] Adicionar suporte a variáveis de ambiente
+- [x] Adicionar healthcheck endpoint
+- [x] Especificar versões das dependências
+- [x] Otimizar configuração do Docker
+
+## 🔜 Próximos Passos
+
 - [ ] Implementar sistema de filas para processamento assíncrono
 - [ ] Adicionar mais opções de configuração do modelo Whisper
-- [ ] Implementar validação de tipos de arquivo
-- [ ] Otimizar configurações para português brasileiro
-- [ ] Adicionar tratamento de erros mais robusto
 - [ ] Implementar rate limiting
-- [ ] Adicionar suporte a variáveis de ambiente
+- [ ] Adicionar sistema de cache para otimização
+- [ ] Implementar autenticação e autorização
+- [ ] Adicionar métricas e monitoramento
+- [ ] Implementar logs estruturados
+- [ ] Adicionar testes automatizados
